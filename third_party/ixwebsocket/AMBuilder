@@ -1,0 +1,62 @@
+# vim: sts=2 ts=8 sw=2 tw=99 et ft=python:
+import os
+
+builder.SetBuildFolder('ixwebsocket')
+
+rvalue = {}
+for cxx in builder.targets:
+  binary = Extension.StaticLibrary(builder, cxx, 'ixwebsocket')
+  binary.compiler.includes += [
+		os.path.join(builder.sourcePath, 'third_party', 'openssl', 'include'),
+    os.path.join(builder.sourcePath, 'third_party', 'ixwebsocket'),
+		os.path.join(builder.sourcePath, 'third_party', 'zlib'),
+  ]
+
+  binary.compiler.defines += [
+    'IXWEBSOCKET_USE_TLS',
+    'IXWEBSOCKET_USE_OPEN_SSL',
+    'IXWEBSOCKET_USE_ZLIB',
+  ]
+
+  # from IXWebSocket CMakeLists.txt
+  binary.sources += [
+    'IXBench.cpp',
+    'IXCancellationRequest.cpp',
+    'IXConnectionState.cpp',
+    'IXDNSLookup.cpp',
+    'IXExponentialBackoff.cpp',
+    'IXGetFreePort.cpp',
+    'IXGzipCodec.cpp',
+    'IXHttp.cpp',
+    'IXHttpClient.cpp',
+    'IXHttpServer.cpp',
+    'IXNetSystem.cpp',
+    'IXSelectInterrupt.cpp',
+    'IXSelectInterruptFactory.cpp',
+    'IXSelectInterruptPipe.cpp',
+    'IXSelectInterruptEvent.cpp',
+    'IXSetThreadName.cpp',
+    'IXSocket.cpp',
+    'IXSocketConnect.cpp',
+    'IXSocketFactory.cpp',
+    'IXSocketOpenSSL.cpp', # SSL support
+    'IXSocketServer.cpp',
+    'IXSocketTLSOptions.cpp',
+    'IXStrCaseCompare.cpp',
+    'IXUdpSocket.cpp',
+    'IXUrlParser.cpp',
+    'IXUuid.cpp',
+    'IXUserAgent.cpp',
+    'IXWebSocket.cpp',
+    'IXWebSocketCloseConstants.cpp',
+    'IXWebSocketHandshake.cpp',
+    'IXWebSocketHttpHeaders.cpp',
+    'IXWebSocketPerMessageDeflate.cpp',
+    'IXWebSocketPerMessageDeflateCodec.cpp',
+    'IXWebSocketPerMessageDeflateOptions.cpp',
+    'IXWebSocketProxyServer.cpp',
+    'IXWebSocketServer.cpp',
+    'IXWebSocketTransport.cpp',
+  ]
+
+  rvalue[binary.compiler.target.arch] = builder.Add(binary)

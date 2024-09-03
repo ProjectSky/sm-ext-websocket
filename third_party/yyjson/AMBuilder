@@ -1,0 +1,20 @@
+# vim: sts=2 ts=8 sw=2 tw=99 et ft=python:
+import os
+
+builder.SetBuildFolder('yyjson')
+
+rvalue = {}
+for cxx in builder.targets:
+  binary = Extension.StaticLibrary(builder, cxx, 'yyjson')
+  binary.compiler.includes += [
+    os.path.join(builder.sourcePath, 'third_party', 'yyjson'),
+  ]
+
+  if binary.compiler.family == 'clang':
+    binary.compiler.cflags += ['-Wno-attributes']
+
+  binary.sources += [
+    'yyjson.c',
+  ]
+
+  rvalue[binary.compiler.target.arch] = builder.Add(binary)
