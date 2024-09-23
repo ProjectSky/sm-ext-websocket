@@ -6,11 +6,16 @@ builder.SetBuildFolder('ixwebsocket')
 rvalue = {}
 for cxx in builder.targets:
   binary = Extension.StaticLibrary(builder, cxx, 'ixwebsocket')
-  binary.compiler.includes += [
-		os.path.join(builder.sourcePath, 'third_party', 'openssl', 'include'),
-    os.path.join(builder.sourcePath, 'third_party', 'ixwebsocket'),
-		os.path.join(builder.sourcePath, 'third_party', 'zlib'),
-  ]
+  if binary.compiler.target.platform == 'linux':
+    binary.compiler.includes += [
+      os.path.join(builder.sourcePath, 'third_party', 'ixwebsocket'),
+    ]
+  elif binary.compiler.target.platform == 'windows':
+    binary.compiler.includes += [
+      os.path.join(builder.sourcePath, 'third_party', 'openssl', 'include'),
+      os.path.join(builder.sourcePath, 'third_party', 'ixwebsocket'),
+      os.path.join(builder.sourcePath, 'third_party', 'zlib'),
+    ]
 
   binary.compiler.defines += [
     'IXWEBSOCKET_USE_TLS',

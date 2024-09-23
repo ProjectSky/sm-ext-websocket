@@ -173,9 +173,9 @@ extern "C" {
 
 # ifndef OPENSSL_NO_KTLS
 #  define BIO_get_ktls_send(b)         \
-     (BIO_ctrl(b, BIO_CTRL_GET_KTLS_SEND, 0, NULL) > 0)
+     BIO_ctrl(b, BIO_CTRL_GET_KTLS_SEND, 0, NULL)
 #  define BIO_get_ktls_recv(b)         \
-     (BIO_ctrl(b, BIO_CTRL_GET_KTLS_RECV, 0, NULL) > 0)
+     BIO_ctrl(b, BIO_CTRL_GET_KTLS_RECV, 0, NULL)
 # else
 #  define BIO_get_ktls_send(b)  (0)
 #  define BIO_get_ktls_recv(b)  (0)
@@ -819,7 +819,6 @@ void BIO_copy_next_retry(BIO *b);
 
 # define ossl_bio__attr__(x)
 # if defined(__GNUC__) && defined(__STDC_VERSION__) \
-    && !defined(__MINGW32__) && !defined(__MINGW64__) \
     && !defined(__APPLE__)
     /*
      * Because we support the 'z' modifier, which made its appearance in C99,
@@ -867,7 +866,7 @@ int BIO_meth_set_puts(BIO_METHOD *biom,
                       int (*puts) (BIO *, const char *));
 int (*BIO_meth_get_gets(const BIO_METHOD *biom)) (BIO *, char *, int);
 int BIO_meth_set_gets(BIO_METHOD *biom,
-                      int (*ossl_gets) (BIO *, char *, int));
+                      int (*gets) (BIO *, char *, int));
 long (*BIO_meth_get_ctrl(const BIO_METHOD *biom)) (BIO *, int, long, void *);
 int BIO_meth_set_ctrl(BIO_METHOD *biom,
                       long (*ctrl) (BIO *, int, long, void *));

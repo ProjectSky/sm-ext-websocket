@@ -1275,6 +1275,11 @@ static cell_t pawn_json_pointer_get_bool(IPluginContext *pContext, const cell_t 
 		return BAD_HANDLE;
 	}
 
+	if (!yyjson_mut_is_bool(ptr)) {
+		pContext->ReportError("JSON value at path '%s' is not a boolean", path);
+		return 0;
+	}
+
 	return yyjson_mut_get_bool(ptr);
 }
 
@@ -1358,10 +1363,35 @@ static cell_t pawn_json_pointer_get_string(IPluginContext *pContext, const cell_
 		pContext->ReportError("JSON pointer get error (%u): %s at position: %d", ptrGetError.code, ptrGetError.msg, ptrGetError.pos);
 		return BAD_HANDLE;
 	}
+
+	if (!yyjson_mut_is_str(ptr)) {
+		pContext->ReportError("JSON value at path '%s' is not a string", path);
+		return 0;
+	}
 	
 	pContext->StringToLocalUTF8(params[3], params[4], yyjson_mut_get_str(ptr), NULL);
 
 	return 1;
+}
+
+static cell_t pawn_json_pointer_get_is_null(IPluginContext *pContext, const cell_t *params)
+{
+	YYJsonWrapper *handle = g_WebsocketExt.GetJSONPointer(pContext, params[1]);
+
+	if (!handle) return BAD_HANDLE;
+
+	char *path;
+	pContext->LocalToString(params[2], &path);
+
+	yyjson_ptr_err ptrGetError;
+	yyjson_mut_val *ptr = yyjson_mut_doc_ptr_getx(handle->m_pDocument_mut, path, strlen(path), NULL, &ptrGetError);
+
+	if (ptrGetError.code) {
+		pContext->ReportError("JSON pointer get error (%u): %s at position: %d", ptrGetError.code, ptrGetError.msg, ptrGetError.pos);
+		return BAD_HANDLE;
+	}
+
+	return yyjson_mut_is_null(ptr);
 }
 
 static cell_t pawn_json_pointer_set(IPluginContext *pContext, const cell_t *params)
@@ -1769,6 +1799,7 @@ const sp_nativeinfo_t json_natives[] =
 	{"YYJSON.PtrGetInt", pawn_json_pointer_get_int},
 	{"YYJSON.PtrGetInt64", pawn_json_pointer_get_integer64},
 	{"YYJSON.PtrGetString", pawn_json_pointer_get_string},
+	{"YYJSON.PtrGetIsNull", pawn_json_pointer_get_is_null},
 	{"YYJSON.PtrSet", pawn_json_pointer_set},
 	{"YYJSON.PtrSetBool", pawn_json_pointer_set_bool},
 	{"YYJSON.PtrSetFloat", pawn_json_pointer_set_float},

@@ -16,7 +16,7 @@ This is a [SourceMod](http://www.sourcemod.net/) extension that provides some me
 ``` sh
 sudo dpkg --add-architecture i386
 sudo apt-get update
-sudo apt-get install clang g++-multilib zlib1g-dev libssl-dev zlib1g-dev:i386 libssl-dev:i386
+sudo apt-get install clang g++-multilib zlib1g-dev zlib1g-dev:i386 libssl-dev libssl-dev:i386
 clone project
 mkdir build && cd build
 python ../configure.py --enable-optimize --symbol-files --sm-path=YOU_SOURCEMOD_PATH --targets=x86,x64

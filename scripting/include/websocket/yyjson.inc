@@ -305,6 +305,14 @@ methodmap YYJSON < Handle
   public native bool PtrGetString(const char[] path, char[] buffer, int maxlength)
 
   /**
+  * Get value is null by a JSON Pointer
+  *
+  * @param path              The JSON pointer string (UTF-8 with null-terminator)
+  *
+  */
+  public native bool PtrGetIsNull(const char[] path)
+
+  /**
   * Set value by a JSON Pointer
   *
   * @note                    The parent nodes will be created if they do not exist. If the target value already exists, it will be replaced by the new value

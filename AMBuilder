@@ -29,13 +29,11 @@ for cxx in builder.targets:
   ]
 
   if binary.compiler.target.platform == 'linux':
-    print(arch)
     binary.compiler.postlink += [
+      '-lz',
+      '-lssl',
       ixwebsocket[arch].binary,
       libyyjson[arch].binary,
-      libz[arch].binary,
-      os.path.join(builder.sourcePath, 'third_party', 'openssl', 'lib', 'libssl_static_{}.a'.format(arch)),
-      os.path.join(builder.sourcePath, 'third_party', 'openssl', 'lib', 'libcrypto_static_{}.a'.format(arch)),
     ]
   elif binary.compiler.target.platform == 'windows':
     binary.compiler.postlink += [
