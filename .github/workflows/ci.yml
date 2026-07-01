@@ -18,12 +18,17 @@ permissions:
 
 jobs:
   build:
-    name: build on ${{ matrix.os_short }}
+    name: build on ${{ matrix.os_short }} (${{ matrix.sm.label }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [windows-latest, ubuntu-22.04]
+        sm:
+          - label: sm1.13
+            ref: master
+          - label: sm1.12
+            ref: "1.12-dev"
         include:
           - os: windows-latest
             os_short: win
@@ -50,7 +55,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: alliedmodders/sourcemod
-          ref: master
+          ref: ${{ matrix.sm.ref }}
           path: sourcemod
           submodules: recursive
           fetch-depth: 1
@@ -87,7 +92,7 @@ jobs:
       - name: Uploading package
         uses: actions/upload-artifact@v4
         with:
-          name: sm-ext-websocket-${{ matrix.os_short }}-${{ env.GITHUB_SHA_SHORT }}
+          name: sm-ext-websocket-${{ matrix.os_short }}-${{ matrix.sm.label }}-${{ env.GITHUB_SHA_SHORT }}
           path: extension/build/package
           retention-days: 5
 
