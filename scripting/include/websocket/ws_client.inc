@@ -38,6 +38,14 @@ typeset WebsocketCallback
   function void (WebSocket ws, const JSON data, int wireSize);
 
   /**
+  * OnMessage (BINARY) - Called when a BINARY message is received
+  * @param ws                WebSocket handle
+  * @param data              binary data
+  * @param wireSize          size of the message on the wire (including null terminator)
+  */
+  function void (WebSocket ws, const char[] data, int wireSize);
+
+  /**
   * OnClose - Called when the WebSocket connection is closed
   * @param ws                WebSocket handle
   * @param code              close code

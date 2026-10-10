@@ -7,6 +7,7 @@ enum
 {
 	WebSocket_JSON,
 	WebSocket_STRING,
+	WebSocket_BINARY,
 };
 
 class WebSocketClient
