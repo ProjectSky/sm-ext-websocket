@@ -113,19 +113,33 @@ methodmap WebSocket < Handle
   public native bool GetHeader(const char[] key, char[] buffer, int maxlength);
 
   /**
+  * Send a binary message over the WebSocket connection
+  *
+  * @param data              Byte array to send 
+  * @param length            Length of the binary data
+  *
+  * @return                  Success status 
+  */
+  public native bool WriteBinary(const char[] data, int length);
+
+  /**
   * Send a string message over the WebSocket connection
   *
   * @param message           Message to send
+  *
+  * @return                  Success status 
   */
-  public native void WriteString(const char[] message);
+  public native bool WriteString(const char[] message);
 
   /**
   * Send a JSON message over the WebSocket connection
   *
   * @param data              JSON data to send
   * @param write_flg         Write flags (JSON_WRITE_FLAG values, default: JSON_WRITE_NOFLAG)
+  *
+  * @return                  Success status 
   */
-  public native void WriteJSON(const JSON data, JSON_WRITE_FLAG write_flg = JSON_WRITE_NOFLAG);
+  public native bool WriteJSON(const JSON data, JSON_WRITE_FLAG write_flg = JSON_WRITE_NOFLAG);
 
   /**
   * Open the WebSocket connection
