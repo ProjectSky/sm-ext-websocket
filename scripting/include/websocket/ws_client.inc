@@ -9,7 +9,8 @@ enum WebSocketState
 enum WebsocketType
 {
   WebSocket_JSON,
-  WebSocket_STRING
+  WebSocket_STRING,
+  WebSocket_BINARY
 }
 
 // Define a typeset for WebSocket callbacks
