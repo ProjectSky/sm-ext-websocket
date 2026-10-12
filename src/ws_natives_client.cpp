@@ -53,7 +53,7 @@ static cell_t ws_SetMessageCallback(IPluginContext *pContext, const cell_t *para
         default:
         case WebSocket_BINARY:
         case WebSocket_JSON:
-            forwardMiddleType = ParamCell;
+            forwardMiddleType = Param_Cell;
             break;
         case WebSocket_STRING:
             forwardMiddleType = Param_String;
