@@ -44,7 +44,7 @@ typeset WebsocketCallback
   * @param data              binary data
   * @param wireSize          size of the message on the wire (including null terminator)
   */
-  function void (WebSocket ws, const char[] data, int wireSize);
+  function void (WebSocket ws, const int[] data, int wireSize);
 
   /**
   * OnClose - Called when the WebSocket connection is closed
