@@ -50,13 +50,16 @@ static cell_t ws_SetMessageCallback(IPluginContext *pContext, const cell_t *para
     auto forwardMiddleType = Param_Cell;
 
     switch(pWebSocketClient->m_callback_type) {
-        default:
         case WebSocket_BINARY:
+            forwardMiddleType = Param_Array;
+            break;
         case WebSocket_JSON:
             forwardMiddleType = Param_Cell;
             break;
         case WebSocket_STRING:
             forwardMiddleType = Param_String;
+            break;
+        default:
             break;
     }
 
