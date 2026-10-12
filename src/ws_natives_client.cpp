@@ -47,8 +47,21 @@ static cell_t ws_SetMessageCallback(IPluginContext *pContext, const cell_t *para
 		forwards->ReleaseForward(pWebSocketClient->pMessageForward);
 	}
 
-	pWebSocketClient->pMessageForward = forwards->CreateForwardEx(nullptr, ET_Ignore, 3, nullptr,
-		Param_Cell, pWebSocketClient->m_callback_type == WebSocket_JSON ? Param_Cell : Param_String, Param_Cell);
+    auto forwardMiddleType = Param_Cell;
+
+    switch(pWebSocketClient->m_callback_type) {
+        default:
+        case WebSocket_BINARY:
+        case WebSocket_JSON:
+            forwardMiddleType = ParamCell;
+            break;
+        case WebSocket_STRING:
+            forwardMiddleType = Param_String;
+            break;
+    }
+
+	pWebSocketClient->pMessageForward = forwards->CreateForwardEx(nullptr, ET_Ignore, 3, nullptr, Param_Cell, forwardMiddleType, Param_Cell);
+
 	if (!pWebSocketClient->pMessageForward || !pWebSocketClient->pMessageForward->AddFunction(callback))
 	{
 		pContext->ReportError("Could not create message forward.");
