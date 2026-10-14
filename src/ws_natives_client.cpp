@@ -47,8 +47,24 @@ static cell_t ws_SetMessageCallback(IPluginContext *pContext, const cell_t *para
 		forwards->ReleaseForward(pWebSocketClient->pMessageForward);
 	}
 
-	pWebSocketClient->pMessageForward = forwards->CreateForwardEx(nullptr, ET_Ignore, 3, nullptr,
-		Param_Cell, pWebSocketClient->m_callback_type == WebSocket_JSON ? Param_Cell : Param_String, Param_Cell);
+    auto forwardMiddleType = Param_Cell;
+
+    switch(pWebSocketClient->m_callback_type) {
+        case WebSocket_BINARY:
+            forwardMiddleType = Param_Array;
+            break;
+        case WebSocket_JSON:
+            forwardMiddleType = Param_Cell;
+            break;
+        case WebSocket_STRING:
+            forwardMiddleType = Param_String;
+            break;
+        default:
+            break;
+    }
+
+	pWebSocketClient->pMessageForward = forwards->CreateForwardEx(nullptr, ET_Ignore, 3, nullptr, Param_Cell, forwardMiddleType, Param_Cell);
+
 	if (!pWebSocketClient->pMessageForward || !pWebSocketClient->pMessageForward->AddFunction(callback))
 	{
 		pContext->ReportError("Could not create message forward.");
@@ -213,6 +229,42 @@ static cell_t ws_GetReadyState(IPluginContext *pContext, const cell_t *params)
 	return (cell_t)pWebSocketClient->m_webSocket->getReadyState();
 }
 
+static cell_t ws_WriteBinary(IPluginContext *pContext, const cell_t *params)
+{
+    WebSocketClient *pWebSocketClient = GetWsPointer(pContext, params[1]);
+
+    if (!pWebSocketClient) return 0;
+
+    const cell_t length = params[3];
+
+    if (length < 0) 
+    {
+        return pContext->ThrowNativeError(
+            "Binary message length cannot be negative"
+        );
+    }
+
+    char* data = nullptr;
+
+    int error = pContext->LocalToString(params[2], &data);
+
+    if (error != SP_ERROR_NONE)
+    {
+        return pContext->ThrowNativeError(
+            "Could not access binary message buffer"
+        );
+    }
+
+    std::string payload(data, static_cast<size_t>(length));
+
+    auto result = pWebSocketClient->m_webSocket->send(
+        payload,
+        true
+    );
+
+    return result.success ? 1 : 0;
+}
+
 static cell_t ws_WriteString(IPluginContext *pContext, const cell_t *params)
 {
 	WebSocketClient* pWebSocketClient = GetWsPointer(pContext, params[1]);
@@ -222,9 +274,9 @@ static cell_t ws_WriteString(IPluginContext *pContext, const cell_t *params)
 	char *msg;
 	pContext->LocalToString(params[2], &msg);
 
-	pWebSocketClient->m_webSocket->send(msg);
+	auto result = pWebSocketClient->m_webSocket->send(msg);
 
-	return 1;
+	return result.success ? 1 : 0;
 }
 
 static cell_t ws_WriteJSON(IPluginContext *pContext, const cell_t *params)
@@ -248,10 +300,10 @@ static cell_t ws_WriteJSON(IPluginContext *pContext, const cell_t *params)
 		return pContext->ThrowNativeError("Failed to serialize JSON to string");
 	}
 
-	pWebSocketClient->m_webSocket->send(json_str);
+	auto result = pWebSocketClient->m_webSocket->send(json_str);
 	free(json_str);
 
-	return 1;
+	return result.success ? 1 : 0;
 }
 
 static cell_t ws_AutoReconnect(IPluginContext *pContext, const cell_t *params)
@@ -689,6 +741,7 @@ const sp_nativeinfo_t ws_natives[] =
 	{"WebSocket.Connect",                ws_Connect},
 	{"WebSocket.SetHeader",              ws_SetHeader},
 	{"WebSocket.GetHeader",              ws_GetHeader},
+	{"WebSocket.WriteBinary",            ws_WriteBinary},
 	{"WebSocket.WriteString",            ws_WriteString},
 	{"WebSocket.WriteJSON",              ws_WriteJSON},
 	{"WebSocket.Disconnect",             ws_Disconnect},

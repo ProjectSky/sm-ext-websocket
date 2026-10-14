@@ -174,6 +174,31 @@ void WsMessageTaskContext::OnCompleted()
 			handlesys->FreeHandle(jsonHandle, &pSec);
 			break;
 		}
+		case WebSocket_BINARY:
+		{
+			std::vector<cell_t> bytes;
+			bytes.reserve(m_message.size());
+
+			for (unsigned char byte : m_message)
+			{
+				bytes.push_back(static_cast<cell_t>(byte));
+			}
+
+			m_client->pMessageForward->PushCell(m_client->m_websocket_handle);
+
+			cell_t empty = 0;
+			const unsigned int length = static_cast<unsigned int>(bytes.size());
+
+			m_client->pMessageForward->PushArray(
+				bytes.empty() ? &empty : bytes.data(),
+				length
+			);
+
+			m_client->pMessageForward->PushCell(static_cast<cell_t>(length));
+
+			m_client->pMessageForward->Execute(nullptr);
+			break;
+		}
 	}
 }
 

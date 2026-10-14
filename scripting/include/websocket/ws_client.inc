@@ -9,7 +9,8 @@ enum WebSocketState
 enum WebsocketType
 {
   WebSocket_JSON,
-  WebSocket_STRING
+  WebSocket_STRING,
+  WebSocket_BINARY
 }
 
 // Define a typeset for WebSocket callbacks
@@ -36,6 +37,14 @@ typeset WebsocketCallback
   * @param wireSize          size of the message on the wire (including null terminator)
   */
   function void (WebSocket ws, const JSON data, int wireSize);
+
+  /**
+  * OnMessage (BINARY) - Called when a BINARY message is received
+  * @param ws                WebSocket handle
+  * @param data              binary data
+  * @param wireSize          size of the message on the wire (including null terminator)
+  */
+  function void (WebSocket ws, const int[] data, int wireSize);
 
   /**
   * OnClose - Called when the WebSocket connection is closed
@@ -113,19 +122,33 @@ methodmap WebSocket < Handle
   public native bool GetHeader(const char[] key, char[] buffer, int maxlength);
 
   /**
+  * Send a binary message over the WebSocket connection
+  *
+  * @param data              Byte array to send 
+  * @param length            Length of the binary data
+  *
+  * @return                  Success status 
+  */
+  public native bool WriteBinary(const char[] data, int length);
+
+  /**
   * Send a string message over the WebSocket connection
   *
   * @param message           Message to send
+  *
+  * @return                  Success status 
   */
-  public native void WriteString(const char[] message);
+  public native bool WriteString(const char[] message);
 
   /**
   * Send a JSON message over the WebSocket connection
   *
   * @param data              JSON data to send
   * @param write_flg         Write flags (JSON_WRITE_FLAG values, default: JSON_WRITE_NOFLAG)
+  *
+  * @return                  Success status 
   */
-  public native void WriteJSON(const JSON data, JSON_WRITE_FLAG write_flg = JSON_WRITE_NOFLAG);
+  public native bool WriteJSON(const JSON data, JSON_WRITE_FLAG write_flg = JSON_WRITE_NOFLAG);
 
   /**
   * Open the WebSocket connection
